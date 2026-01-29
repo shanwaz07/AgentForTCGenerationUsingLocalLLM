@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent TC Generator | Leoforce</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===== Design Tokens (Leoforce Design Language 2.0) ===== */
+        :root {
+            /* Colors */
+            --color-primary: #3E3D6D;
+            --color-primary-dark: #2E2D5D;
+            --color-accent: #D4A574;
+            --color-bg-main: #F5F5F7;
+            --color-bg-white: #FFFFFF;
+            --color-text-primary: #1A1A1A;
+            --color-text-secondary: #6B7280;
+            --color-border: #E5E7EB;
+            --color-error: #EF4444;
+
+            /* Typography */
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --font-size-xs: 12px;
+            --font-size-sm: 14px;
+            --font-size-base: 16px;
+            --font-size-lg: 18px;
+            --font-size-xl: 20px;
+            --font-size-2xl: 24px;
+            --font-size-3xl: 28px;
+
+            /* Spacing */
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 12px;
+            --spacing-lg: 16px;
+            --spacing-xl: 20px;
+            --spacing-2xl: 24px;
+            --spacing-3xl: 32px;
+
+            /* Layout */
+            --header-height: 60px;
+            --container-max-width: 1200px;
+            --border-radius-sm: 4px;
+            --border-radius-md: 8px;
+            --border-radius-lg: 12px;
+
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* ===== Reset & Base Styles ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--color-bg-main);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ===== Header Component ===== */
+        header {
+            background-color: var(--color-primary);
+            height: var(--header-height);
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-container {
+            max-width: var(--container-max-width);
+            margin: 0 auto;
+            height: 100%;
+            padding: 0 var(--spacing-2xl);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .logo-icon {
+            height: 32px;
+            width: auto;
+            filter: brightness(0) invert(1);
+        }
+
+        .logo-text {
+            color: var(--color-bg-white);
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .header-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            margin-left: var(--spacing-2xl);
+            padding-left: var(--spacing-2xl);
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* ===== Main Content ===== */
+        main {
+            max-width: var(--container-max-width);
+            margin: 0 auto;
+            padding: var(--spacing-3xl) var(--spacing-2xl);
+        }
+
+        .page-title {
+            font-size: var(--font-size-3xl);
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .page-description {
+            font-size: var(--font-size-base);
+            color: var(--color-text-secondary);
+            margin-bottom: var(--spacing-3xl);
+        }
+
+        /* ===== Chat Container ===== */
+        #chat-container {
+            background-color: var(--color-bg-white);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: var(--spacing-2xl);
+            min-height: 500px;
+            max-height: 600px;
+            overflow-y: auto;
+            margin-bottom: var(--spacing-xl);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xl);
+        }
+
+        /* ===== Message Styles ===== */
+        .message {
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            max-width: 70%;
+        }
+
+        .message.user .message-content {
+            background-color: var(--color-primary);
+            color: var(--color-bg-white);
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--border-radius-md) var(--border-radius-md) 0 var(--border-radius-md);
+            font-size: var(--font-size-sm);
+        }
+
+        .message.bot {
+            align-self: flex-start;
+            width: 100%;
+        }
+
+        .message.bot .message-content {
+            background-color: var(--color-bg-main);
+            padding: var(--spacing-lg);
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-sm);
+            color: var(--color-text-primary);
+        }
+
+        /* ===== Test Case Card ===== */
+        .tc-card {
+            background: var(--color-bg-white);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius-md);
+            margin-bottom: var(--spacing-md);
+            overflow: hidden;
+            transition: box-shadow 0.2s ease;
+        }
+
+        .tc-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .tc-header {
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: var(--color-primary);
+            color: var(--color-bg-white);
+            font-weight: 600;
+            font-size: var(--font-size-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tc-id {
+            color: var(--color-accent);
+            font-family: 'Courier New', monospace;
+            font-size: var(--font-size-xs);
+            font-weight: 600;
+        }
+
+        .tc-body {
+            padding: var(--spacing-lg);
+        }
+
+        .tc-section {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .tc-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .tc-label {
+            font-size: var(--font-size-xs);
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: var(--spacing-xs);
+            font-weight: 600;
+        }
+
+        .tc-content {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+        }
+
+        .tc-content ul {
+            margin: var(--spacing-sm) 0;
+            padding-left: var(--spacing-xl);
+        }
+
+        .tc-content li {
+            margin-bottom: var(--spacing-xs);
+        }
+
+        /* ===== Input Area ===== */
+        .input-area {
+            background-color: var(--color-bg-white);
+            padding: var(--spacing-xl);
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--color-border);
+            background-color: var(--color-bg-white);
+            color: var(--color-text-primary);
+            font-size: var(--font-size-sm);
+            font-family: var(--font-family);
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(62, 61, 109, 0.1);
+        }
+
+        input[type="text"]::placeholder {
+            color: var(--color-text-secondary);
+        }
+
+        button {
+            padding: var(--spacing-md) var(--spacing-2xl);
+            border-radius: var(--border-radius-md);
+            border: none;
+            background-color: var(--color-primary);
+            color: var(--color-bg-white);
+            font-weight: 600;
+            font-size: var(--font-size-sm);
+            font-family: var(--font-family);
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            white-space: nowrap;
+        }
+
+        button:hover:not(:disabled) {
+            background-color: var(--color-primary-dark);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+
+        button:disabled {
+            background-color: var(--color-border);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* ===== Loader ===== */
+        .loader {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--color-bg-white);
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.8s linear infinite;
+        }
+
+        /* ===== Animations ===== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ===== Error State ===== */
+        .error-text {
+            color: var(--color-error);
+        }
+
+        /* ===== Responsive Design ===== */
+        @media (max-width: 768px) {
+            .header-container {
+                padding: 0 var(--spacing-lg);
+            }
+
+            .header-subtitle {
+                display: none;
+            }
+
+            main {
+                padding: var(--spacing-xl) var(--spacing-lg);
+            }
+
+            .page-title {
+                font-size: var(--font-size-2xl);
+            }
+
+            .message.user {
+                max-width: 85%;
+            }
+
+            .input-wrapper {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+
+        /* ===== Scrollbar Styling ===== */
+        #chat-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #chat-container::-webkit-scrollbar-track {
+            background: var(--color-bg-main);
+            border-radius: var(--border-radius-sm);
+        }
+
+        #chat-container::-webkit-scrollbar-thumb {
+            background: var(--color-border);
+            border-radius: var(--border-radius-sm);
+        }
+
+        #chat-container::-webkit-scrollbar-thumb:hover {
+            background: var(--color-text-secondary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header Component -->
+    <header>
+        <div class="header-container">
+            <div class="logo-section">
+                <img src="leoforce_logo.png" alt="Leoforce Logo" class="logo-icon">
+                <span class="logo-text">Leoforce</span>
+                <span class="header-subtitle">Agent TC Generator</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <h1 class="page-title">Test Case Generator</h1>
+        <p class="page-description">Describe your feature or requirement, and our AI will generate comprehensive test
+            cases using Llama 3.2.</p>
+
+        <div id="chat-container">
+            <div class="message bot">
+                <div class="message-content">
+                    Hello! I'm your AI QA Assistant powered by Llama 3.2. Describe a feature or requirement, and I will
+                    generate structured test cases for you.
+                </div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <div class="input-wrapper">
+                <input type="text" id="userInput" placeholder="e.g., User Login with Two-Factor Authentication"
+                    autocomplete="off">
+                <button id="sendBtn" onclick="sendMessage()">Generate Test Cases</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        userInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter' && !sendBtn.disabled) sendMessage();
+        });
+
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+
+            // User Message
+            appendMessage(text, 'user');
+            userInput.value = '';
+            userInput.disabled = true;
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<div class="loader"></div>';
+
+            try {
+                const response = await fetch('http://localhost:5000/api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_input: text })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    appendMessage(`Error: ${data.error}`, 'bot', true);
+                } else if (data.test_cases) {
+                    renderTestCases(data.test_cases);
+                } else {
+                    appendMessage("Received unexpected response format.", 'bot', true);
+                }
+
+            } catch (err) {
+                appendMessage(`Connection failed: ${err.message}. Is the backend running on port 5000?`, 'bot', true);
+            } finally {
+                userInput.disabled = false;
+                sendBtn.disabled = false;
+                sendBtn.innerText = 'Generate Test Cases';
+                userInput.focus();
+            }
+        }
+
+        function appendMessage(text, type, isError = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.innerText = text;
+            if (isError) contentDiv.classList.add('error-text');
+
+            messageDiv.appendChild(contentDiv);
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function renderTestCases(testCases) {
+            const botDiv = document.createElement('div');
+            botDiv.className = 'message bot';
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+
+            testCases.forEach(tc => {
+                const card = document.createElement('div');
+                card.className = 'tc-card';
+
+                let stepsHtml = '';
+                if (Array.isArray(tc.steps)) {
+                    stepsHtml = `<ul>${tc.steps.map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ul>`;
+                }
+
+                card.innerHTML = `
+                <div class="tc-header">
+                    <span>${escapeHtml(tc.title || 'Test Case')}</span>
+                    <span class="tc-id">${escapeHtml(tc.id || 'TC')}</span>
+                </div>
+                <div class="tc-body">
+                    <div class="tc-section">
+                        <div class="tc-label">Description</div>
+                        <div class="tc-content">${escapeHtml(tc.description || 'N/A')}</div>
+                    </div>
+                    <div class="tc-section">
+                        <div class="tc-label">Preconditions</div>
+                        <div class="tc-content">${escapeHtml(tc.preconditions || 'N/A')}</div>
+                    </div>
+                    <div class="tc-section">
+                        <div class="tc-label">Test Steps</div>
+                        <div class="tc-content">${stepsHtml}</div>
+                    </div>
+                     <div class="tc-section">
+                        <div class="tc-label">Expected Result</div>
+                        <div class="tc-content">${escapeHtml(tc.expected_result || 'N/A')}</div>
+                    </div>
+                </div>
+            `;
+                contentDiv.appendChild(card);
+            });
+
+            botDiv.appendChild(contentDiv);
+            chatContainer.appendChild(botDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    </script>
+
+</body>
+
+</html>
