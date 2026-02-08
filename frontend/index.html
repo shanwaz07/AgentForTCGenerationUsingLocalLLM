@@ -17,10 +17,13 @@
             --color-accent: #D4A574;
             --color-bg-main: #F5F5F7;
             --color-bg-white: #FFFFFF;
+            --color-bg-sidebar: #FAFAFB;
             --color-text-primary: #1A1A1A;
             --color-text-secondary: #6B7280;
             --color-border: #E5E7EB;
             --color-error: #EF4444;
+            --color-success: #10B981;
+            --color-info: #3B82F6;
 
             /* Typography */
             --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -43,7 +46,8 @@
 
             /* Layout */
             --header-height: 60px;
-            --container-max-width: 1200px;
+            --sidebar-width: 30%;
+            --content-width: 70%;
             --border-radius-sm: 4px;
             --border-radius-md: 8px;
             --border-radius-lg: 12px;
@@ -68,6 +72,8 @@
             line-height: 1.6;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
+            height: 100vh;
+            overflow: hidden;
         }
 
         /* ===== Header Component ===== */
@@ -78,10 +84,11 @@
             position: sticky;
             top: 0;
             z-index: 1000;
+            flex-shrink: 0;
         }
 
         .header-container {
-            max-width: var(--container-max-width);
+            max-width: 100%;
             margin: 0 auto;
             height: 100%;
             padding: 0 var(--spacing-2xl);
@@ -118,39 +125,624 @@
             border-left: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        /* ===== Main Content ===== */
-        main {
-            max-width: var(--container-max-width);
-            margin: 0 auto;
-            padding: var(--spacing-3xl) var(--spacing-2xl);
+        .settings-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--color-bg-white);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            transition: background-color 0.2s;
         }
 
-        .page-title {
-            font-size: var(--font-size-3xl);
-            font-weight: 700;
-            color: var(--color-text-primary);
-            margin-bottom: var(--spacing-sm);
+        .settings-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
         }
 
-        .page-description {
-            font-size: var(--font-size-base);
-            color: var(--color-text-secondary);
-            margin-bottom: var(--spacing-3xl);
+        /* ===== Main Layout Container ===== */
+        .main-container {
+            display: flex;
+            height: calc(100vh - var(--header-height));
+            overflow: hidden;
         }
 
-        /* ===== Chat Container ===== */
-        #chat-container {
+        /* ===== Settings Panel ===== */
+        .settings-panel {
             background-color: var(--color-bg-white);
             border-radius: var(--border-radius-lg);
             box-shadow: var(--shadow-md);
             padding: var(--spacing-2xl);
-            min-height: 500px;
-            max-height: 600px;
+            margin: var(--spacing-xl);
+            display: none;
+            position: absolute;
+            top: var(--header-height);
+            right: var(--spacing-xl);
+            width: 400px;
+            z-index: 100;
+            max-height: calc(100vh - var(--header-height) - var(--spacing-2xl));
             overflow-y: auto;
-            margin-bottom: var(--spacing-xl);
+        }
+
+        .settings-panel.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .settings-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .close-settings {
+            background: none;
+            border: none;
+            font-size: var(--font-size-xl);
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--border-radius-md);
+        }
+
+        .close-settings:hover {
+            background-color: var(--color-bg-main);
+        }
+
+        .provider-options {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .provider-option {
+            border: 2px solid var(--color-border);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-lg);
+            cursor: pointer;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .provider-option:hover {
+            border-color: var(--color-primary);
+        }
+
+        .provider-option.selected {
+            border-color: var(--color-primary);
+            background-color: rgba(62, 61, 109, 0.05);
+        }
+
+        .provider-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .provider-radio {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--color-primary);
+        }
+
+        .provider-info {
+            flex: 1;
+        }
+
+        .provider-name {
+            font-weight: 600;
+            font-size: var(--font-size-base);
+            color: var(--color-text-primary);
+        }
+
+        .provider-desc {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+        }
+
+        .api-key-section {
+            margin-top: var(--spacing-md);
+            padding-left: 32px;
+            display: none;
+        }
+
+        .api-key-section.visible {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .api-key-input {
+            width: 100%;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-sm);
+            font-family: var(--font-family);
+            margin-top: var(--spacing-sm);
+        }
+
+        .api-key-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(62, 61, 109, 0.1);
+        }
+
+        .api-key-label {
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            color: var(--color-text-primary);
+        }
+
+        .api-key-hint {
+            font-size: var(--font-size-xs);
+            color: var(--color-text-secondary);
+            margin-top: var(--spacing-xs);
+        }
+
+        .save-settings-btn {
+            margin-top: var(--spacing-xl);
+            padding: var(--spacing-md) var(--spacing-2xl);
+            background-color: var(--color-primary);
+            color: var(--color-bg-white);
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-weight: 600;
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .save-settings-btn:hover {
+            background-color: var(--color-primary-dark);
+        }
+
+        .settings-saved {
+            display: inline-block;
+            margin-left: var(--spacing-md);
+            color: var(--color-success);
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .settings-saved.show {
+            opacity: 1;
+        }
+
+        /* ===== Left Sidebar (Input Section) - 30% ===== */
+        .input-sidebar {
+            width: var(--sidebar-width);
+            min-width: 350px;
+            max-width: 500px;
+            background-color: var(--color-bg-sidebar);
+            border-right: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: var(--spacing-xl) var(--spacing-2xl);
+            border-bottom: 1px solid var(--color-border);
+            background-color: var(--color-bg-white);
+        }
+
+        .sidebar-title {
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .sidebar-subtitle {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+        }
+
+        /* Current Provider Badge */
+        .current-provider {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            background-color: rgba(62, 61, 109, 0.1);
+            padding: var(--spacing-xs) var(--spacing-md);
+            border-radius: var(--border-radius-sm);
+            font-size: var(--font-size-sm);
+            color: var(--color-primary);
+            font-weight: 500;
+            margin-top: var(--spacing-md);
+        }
+
+        .provider-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--color-success);
+        }
+
+        /* Input Tabs */
+        .input-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--color-border);
+            background-color: var(--color-bg-white);
+        }
+
+        .input-tab {
+            flex: 1;
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: none;
+            border: none;
+            font-size: var(--font-size-sm);
+            font-weight: 500;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: color 0.2s, background-color 0.2s;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+        }
+
+        .input-tab:hover {
+            color: var(--color-primary);
+            background-color: rgba(62, 61, 109, 0.05);
+        }
+
+        .input-tab.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+            background-color: var(--color-bg-sidebar);
+        }
+
+        /* Input Content Areas */
+        .input-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--spacing-xl);
+        }
+
+        .input-section {
+            display: none;
+        }
+
+        .input-section.active {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+            height: 100%;
+        }
+
+        .input-label {
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .feature-input {
+            width: 100%;
+            flex: 1;
+            min-height: 150px;
+            padding: var(--spacing-lg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius-md);
+            background-color: var(--color-bg-white);
+            color: var(--color-text-primary);
+            font-size: var(--font-size-base);
+            font-family: var(--font-family);
+            resize: vertical;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .feature-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(62, 61, 109, 0.1);
+        }
+
+        .feature-input::placeholder {
+            color: var(--color-text-secondary);
+        }
+
+        /* Image Upload Area */
+        .image-upload-area {
+            border: 2px dashed var(--color-border);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-2xl);
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s, background-color 0.2s;
+            position: relative;
+        }
+
+        .image-upload-area:hover {
+            border-color: var(--color-primary);
+            background-color: rgba(62, 61, 109, 0.02);
+        }
+
+        .image-upload-area.drag-over {
+            border-color: var(--color-primary);
+            background-color: rgba(62, 61, 109, 0.05);
+        }
+
+        .image-upload-area.has-image {
+            border-style: solid;
+            border-color: var(--color-success);
+            background-color: rgba(16, 185, 129, 0.05);
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .upload-text {
+            font-size: var(--font-size-base);
+            color: var(--color-text-primary);
+            font-weight: 500;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .upload-hint {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* Image Preview */
+        .image-preview-container {
+            display: none;
+            position: relative;
+            margin-top: var(--spacing-md);
+        }
+
+        .image-preview-container.visible {
+            display: block;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 200px;
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-md);
+        }
+
+        .remove-image-btn {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: var(--color-error);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: var(--font-size-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+        }
+
+        .remove-image-btn:hover {
+            background-color: #DC2626;
+        }
+
+        /* HTML Code Area */
+        .html-code-area {
+            width: 100%;
+            flex: 1;
+            min-height: 200px;
+            padding: var(--spacing-lg);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius-md);
+            background-color: var(--color-bg-white);
+            color: var(--color-text-primary);
+            font-size: var(--font-size-sm);
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            resize: vertical;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .html-code-area:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(62, 61, 109, 0.1);
+        }
+
+        .html-file-upload {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background-color: var(--color-bg-white);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius-md);
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .html-file-upload:hover {
+            background-color: rgba(62, 61, 109, 0.05);
+        }
+
+        /* Attachment indicators */
+        .attachment-bar {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+            padding: var(--spacing-md) var(--spacing-xl);
+            background-color: var(--color-bg-white);
+            border-top: 1px solid var(--color-border);
+            min-height: 50px;
+        }
+
+        .attachment-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-xs) var(--spacing-md);
+            background-color: rgba(62, 61, 109, 0.1);
+            border-radius: var(--border-radius-sm);
+            font-size: var(--font-size-xs);
+            color: var(--color-primary);
+        }
+
+        .attachment-tag .remove {
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Generate Button Area */
+        .generate-section {
+            padding: var(--spacing-xl);
+            background-color: var(--color-bg-white);
+            border-top: 1px solid var(--color-border);
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: var(--spacing-md) var(--spacing-xl);
+            border-radius: var(--border-radius-md);
+            border: none;
+            background-color: var(--color-primary);
+            color: var(--color-bg-white);
+            font-weight: 600;
+            font-size: var(--font-size-base);
+            font-family: var(--font-family);
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+        }
+
+        .generate-btn:hover:not(:disabled) {
+            background-color: var(--color-primary-dark);
+        }
+
+        .generate-btn:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+
+        .generate-btn:disabled {
+            background-color: var(--color-border);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        /* ===== Right Content Area (Results) - 70% ===== */
+        .results-content {
+            width: var(--content-width);
+            flex: 1;
+            background-color: var(--color-bg-main);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .results-header {
+            padding: var(--spacing-xl) var(--spacing-2xl);
+            background-color: var(--color-bg-white);
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .results-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            color: var(--color-text-primary);
+        }
+
+        .results-count {
+            font-size: var(--font-size-sm);
+            color: var(--color-text-secondary);
+            background-color: var(--color-bg-main);
+            padding: var(--spacing-xs) var(--spacing-md);
+            border-radius: var(--border-radius-sm);
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            background-color: var(--color-success);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .download-btn:hover {
+            background-color: #059669;
+        }
+
+        .download-btn:active {
+            transform: translateY(1px);
+        }
+
+        .results-actions {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        /* Chat/Results Container */
+        #chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--spacing-2xl);
             display: flex;
             flex-direction: column;
             gap: var(--spacing-xl);
+        }
+
+        .welcome-message {
+            background-color: var(--color-bg-white);
+            border-radius: var(--border-radius-lg);
+            padding: var(--spacing-2xl);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+        }
+
+        .welcome-icon {
+            font-size: 48px;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .welcome-title {
+            font-size: var(--font-size-xl);
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .welcome-text {
+            font-size: var(--font-size-base);
+            color: var(--color-text-secondary);
+            max-width: 500px;
+            margin: 0 auto;
         }
 
         /* ===== Message Styles ===== */
@@ -162,7 +754,7 @@
 
         .message.user {
             align-self: flex-end;
-            max-width: 70%;
+            max-width: 80%;
         }
 
         .message.user .message-content {
@@ -179,11 +771,12 @@
         }
 
         .message.bot .message-content {
-            background-color: var(--color-bg-main);
+            background-color: var(--color-bg-white);
             padding: var(--spacing-lg);
             border-radius: var(--border-radius-md);
             font-size: var(--font-size-sm);
             color: var(--color-text-primary);
+            box-shadow: var(--shadow-sm);
         }
 
         /* ===== Test Case Card ===== */
@@ -194,6 +787,7 @@
             margin-bottom: var(--spacing-md);
             overflow: hidden;
             transition: box-shadow 0.2s ease;
+            box-shadow: var(--shadow-sm);
         }
 
         .tc-card:hover {
@@ -254,74 +848,11 @@
             margin-bottom: var(--spacing-xs);
         }
 
-        /* ===== Input Area ===== */
-        .input-area {
-            background-color: var(--color-bg-white);
-            padding: var(--spacing-xl);
-            border-radius: var(--border-radius-lg);
-            box-shadow: var(--shadow-md);
-        }
-
-        .input-wrapper {
-            display: flex;
-            gap: var(--spacing-md);
-        }
-
-        input[type="text"] {
-            flex: 1;
-            padding: var(--spacing-md) var(--spacing-lg);
-            border-radius: var(--border-radius-md);
-            border: 1px solid var(--color-border);
-            background-color: var(--color-bg-white);
-            color: var(--color-text-primary);
-            font-size: var(--font-size-sm);
-            font-family: var(--font-family);
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        input[type="text"]:focus {
-            border-color: var(--color-primary);
-            box-shadow: 0 0 0 3px rgba(62, 61, 109, 0.1);
-        }
-
-        input[type="text"]::placeholder {
-            color: var(--color-text-secondary);
-        }
-
-        button {
-            padding: var(--spacing-md) var(--spacing-2xl);
-            border-radius: var(--border-radius-md);
-            border: none;
-            background-color: var(--color-primary);
-            color: var(--color-bg-white);
-            font-weight: 600;
-            font-size: var(--font-size-sm);
-            font-family: var(--font-family);
-            cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
-            white-space: nowrap;
-        }
-
-        button:hover:not(:disabled) {
-            background-color: var(--color-primary-dark);
-        }
-
-        button:active:not(:disabled) {
-            transform: translateY(1px);
-        }
-
-        button:disabled {
-            background-color: var(--color-border);
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
         /* ===== Loader ===== */
         .loader {
             display: inline-block;
-            width: 14px;
-            height: 14px;
+            width: 16px;
+            height: 16px;
             border: 2px solid var(--color-bg-white);
             border-radius: 50%;
             border-top-color: transparent;
@@ -341,6 +872,18 @@
             }
         }
 
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         @keyframes spin {
             to {
                 transform: rotate(360deg);
@@ -352,60 +895,118 @@
             color: var(--color-error);
         }
 
+        .error-box {
+            background-color: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-lg);
+            color: var(--color-error);
+        }
+
+        .error-box .error-title {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        /* Info/Warning Boxes */
+        .info-box {
+            background-color: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-md);
+            font-size: var(--font-size-sm);
+            color: var(--color-primary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .info-box strong {
+            display: block;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        /* Provider Info Badge in Results */
+        .provider-info-badge {
+            background-color: rgba(62, 61, 109, 0.1);
+            border-radius: var(--border-radius-md);
+            padding: var(--spacing-md) var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+            font-size: var(--font-size-sm);
+            color: var(--color-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        /* ===== Scrollbar Styling ===== */
+        #chat-container::-webkit-scrollbar,
+        .input-sidebar::-webkit-scrollbar,
+        .input-content::-webkit-scrollbar,
+        .settings-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #chat-container::-webkit-scrollbar-track,
+        .input-sidebar::-webkit-scrollbar-track,
+        .input-content::-webkit-scrollbar-track,
+        .settings-panel::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #chat-container::-webkit-scrollbar-thumb,
+        .input-sidebar::-webkit-scrollbar-thumb,
+        .input-content::-webkit-scrollbar-thumb,
+        .settings-panel::-webkit-scrollbar-thumb {
+            background: var(--color-border);
+            border-radius: var(--border-radius-sm);
+        }
+
+        #chat-container::-webkit-scrollbar-thumb:hover,
+        .input-sidebar::-webkit-scrollbar-thumb:hover,
+        .input-content::-webkit-scrollbar-thumb:hover,
+        .settings-panel::-webkit-scrollbar-thumb:hover {
+            background: var(--color-text-secondary);
+        }
+
         /* ===== Responsive Design ===== */
+        @media (max-width: 1024px) {
+            .input-sidebar {
+                min-width: 320px;
+            }
+        }
+
         @media (max-width: 768px) {
-            .header-container {
-                padding: 0 var(--spacing-lg);
+            .main-container {
+                flex-direction: column;
+            }
+
+            .input-sidebar {
+                width: 100%;
+                max-width: none;
+                min-width: auto;
+                max-height: 50vh;
+                border-right: none;
+                border-bottom: 1px solid var(--color-border);
+            }
+
+            .results-content {
+                width: 100%;
+                height: 50vh;
             }
 
             .header-subtitle {
                 display: none;
             }
 
-            main {
-                padding: var(--spacing-xl) var(--spacing-lg);
+            .settings-panel {
+                width: calc(100% - var(--spacing-2xl) * 2);
+                right: var(--spacing-xl);
+                left: var(--spacing-xl);
             }
-
-            .page-title {
-                font-size: var(--font-size-2xl);
-            }
-
-            .message.user {
-                max-width: 85%;
-            }
-
-            .input-wrapper {
-                flex-direction: column;
-            }
-
-            button {
-                width: 100%;
-            }
-        }
-
-        /* ===== Scrollbar Styling ===== */
-        #chat-container::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        #chat-container::-webkit-scrollbar-track {
-            background: var(--color-bg-main);
-            border-radius: var(--border-radius-sm);
-        }
-
-        #chat-container::-webkit-scrollbar-thumb {
-            background: var(--color-border);
-            border-radius: var(--border-radius-sm);
-        }
-
-        #chat-container::-webkit-scrollbar-thumb:hover {
-            background: var(--color-text-secondary);
         }
     </style>
 </head>
 
 <body>
-
     <!-- Header Component -->
     <header>
         <div class="header-container">
@@ -414,77 +1015,647 @@
                 <span class="logo-text">Leoforce</span>
                 <span class="header-subtitle">Agent TC Generator</span>
             </div>
+            <button class="settings-btn" onclick="toggleSettings()">⚙️ Settings</button>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main>
-        <h1 class="page-title">Test Case Generator</h1>
-        <p class="page-description">Describe your feature or requirement, and our AI will generate comprehensive test
-            cases using Llama 3.2.</p>
+    <!-- Settings Panel -->
+    <div class="settings-panel" id="settingsPanel">
+        <div class="settings-header">
+            <span class="settings-title">LLM Provider Settings</span>
+            <button class="close-settings" onclick="toggleSettings()">✕</button>
+        </div>
+        
+        <div class="provider-options">
+            <!-- Local LLM (Ollama) - Default -->
+            <div class="provider-option selected" id="option-ollama" onclick="selectProvider('ollama')">
+                <div class="provider-header">
+                    <input type="radio" name="provider" value="ollama" class="provider-radio" checked id="radio-ollama">
+                    <div class="provider-info">
+                        <div class="provider-name">🖥️ Local LLM (Ollama)</div>
+                        <div class="provider-desc">Run models locally. No API key required. Default option.</div>
+                    </div>
+                </div>
+            </div>
 
-        <div id="chat-container">
-            <div class="message bot">
-                <div class="message-content">
-                    Hello! I'm your AI QA Assistant powered by Llama 3.2. Describe a feature or requirement, and I will
-                    generate structured test cases for you.
+            <!-- OpenAI -->
+            <div class="provider-option" id="option-openai" onclick="selectProvider('openai')">
+                <div class="provider-header">
+                    <input type="radio" name="provider" value="openai" class="provider-radio" id="radio-openai">
+                    <div class="provider-info">
+                        <div class="provider-name">🤖 OpenAI</div>
+                        <div class="provider-desc">Use OpenAI GPT models (GPT-3.5, GPT-4, etc.)</div>
+                    </div>
+                </div>
+                <div class="api-key-section" id="apikey-openai">
+                    <label class="api-key-label">OpenAI API Key</label>
+                    <input type="text" class="api-key-input" id="input-openai-key" 
+                           placeholder="sk-..." autocomplete="off">
+                    <div class="api-key-hint">Your API key is stored locally in your browser.</div>
+                </div>
+            </div>
+
+            <!-- KIMI -->
+            <div class="provider-option" id="option-kimi" onclick="selectProvider('kimi')">
+                <div class="provider-header">
+                    <input type="radio" name="provider" value="kimi" class="provider-radio" id="radio-kimi">
+                    <div class="provider-info">
+                        <div class="provider-name">🌙 KIMI (Moonshot AI)</div>
+                        <div class="provider-desc">Use KIMI AI models from Moonshot AI</div>
+                    </div>
+                </div>
+                <div class="api-key-section" id="apikey-kimi">
+                    <label class="api-key-label">KIMI API Key</label>
+                    <input type="text" class="api-key-input" id="input-kimi-key" 
+                           placeholder="Enter your KIMI API key" autocomplete="off">
+                    <div class="api-key-hint">Your API key is stored locally in your browser.</div>
+                </div>
+            </div>
+
+            <!-- Groq -->
+            <div class="provider-option" id="option-groq" onclick="selectProvider('groq')">
+                <div class="provider-header">
+                    <input type="radio" name="provider" value="groq" class="provider-radio" id="radio-groq">
+                    <div class="provider-info">
+                        <div class="provider-name">⚡ Groq</div>
+                        <div class="provider-desc">Ultra-fast LLM inference with Llama 3.1</div>
+                    </div>
+                </div>
+                <div class="api-key-section" id="apikey-groq">
+                    <label class="api-key-label">Groq API Key</label>
+                    <input type="text" class="api-key-input" id="input-groq-key" 
+                           placeholder="gsk_..." autocomplete="off">
+                    <div class="api-key-hint">Get your API key from console.groq.com</div>
                 </div>
             </div>
         </div>
 
-        <div class="input-area">
-            <div class="input-wrapper">
-                <input type="text" id="userInput" placeholder="e.g., User Login with Two-Factor Authentication"
-                    autocomplete="off">
-                <button id="sendBtn" onclick="sendMessage()">Generate Test Cases</button>
+        <button class="save-settings-btn" onclick="saveSettings()">Save Settings</button>
+        <span class="settings-saved" id="settingsSaved">✓ Settings saved!</span>
+    </div>
+
+    <!-- Main Container - Split View -->
+    <div class="main-container">
+        <!-- Left Sidebar - Input Section (30%) -->
+        <aside class="input-sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">Generate Test Cases</h2>
+                <p class="sidebar-subtitle">Describe your feature or upload UI screenshots/HTML code</p>
+                <div class="current-provider" id="currentProviderBadge">
+                    <span class="provider-indicator"></span>
+                    <span id="currentProviderText">Using: Local LLM (Ollama)</span>
+                </div>
             </div>
-        </div>
-    </main>
+
+            <!-- Input Tabs -->
+            <div class="input-tabs">
+                <button class="input-tab active" onclick="switchTab('text')" id="tab-text">📝 Text</button>
+                <button class="input-tab" onclick="switchTab('image')" id="tab-image">🖼️ Image</button>
+                <button class="input-tab" onclick="switchTab('html')" id="tab-html">📄 HTML</button>
+            </div>
+
+            <!-- Input Content -->
+            <div class="input-content">
+                <!-- Text Input Section -->
+                <div class="input-section active" id="section-text">
+                    <label class="input-label">Feature Description</label>
+                    <textarea class="feature-input" id="textInput" 
+                        placeholder="Example: User Login with email and password, including Remember Me checkbox, Forgot Password link, and Two-Factor Authentication"></textarea>
+                </div>
+
+                <!-- Image Input Section -->
+                <div class="input-section" id="section-image">
+                    <label class="input-label">Upload UI Screenshot</label>
+                    <div class="info-box" id="imageProviderNote">
+                        <strong>ℹ️ Note:</strong>
+                        Local LLM (Ollama) cannot analyze images. Please describe the image in the context box below, or switch to OpenAI (GPT-4 Vision) in Settings for image analysis.
+                    </div>
+                    <div class="image-upload-area" id="imageUploadArea" onclick="document.getElementById('imageFileInput').click()">
+                        <div class="upload-icon">🖼️</div>
+                        <div class="upload-text">Click to upload or drag image here</div>
+                        <div class="upload-hint">Supports: PNG, JPG, GIF (Max 10MB)</div>
+                        <input type="file" id="imageFileInput" class="file-input" accept="image/*" onchange="handleImageFileSelect(event)">
+                    </div>
+                    <div class="image-preview-container" id="imagePreviewContainer">
+                        <img class="image-preview" id="imagePreview" alt="Preview">
+                        <button class="remove-image-btn" onclick="removeImage()">×</button>
+                    </div>
+                    <label class="input-label" style="margin-top: var(--spacing-md);">
+                        Image Description <span style="color: var(--color-error);">(Required for Local LLM)</span>
+                    </label>
+                    <textarea class="feature-input" id="imageContextInput" style="min-height: 100px; flex: none;"
+                        placeholder="CRITICAL: Describe what the image shows in detail - what UI elements are visible (forms, buttons, fields), what page this is, any error messages, etc. The AI needs this description to generate relevant test cases."></textarea>
+                </div>
+
+                <!-- HTML Input Section -->
+                <div class="input-section" id="section-html">
+                    <label class="input-label">HTML Code</label>
+                    <textarea class="html-code-area" id="htmlCodeInput" 
+                        placeholder="<!-- Paste your HTML code here -->\n<div class=\"login-form\">\n  <input type=\"email\" placeholder=\"Email\">\n  <input type=\"password\" placeholder=\"Password\">\n  <button>Login</button>\n</div>"></textarea>
+                    <div class="html-file-upload" onclick="document.getElementById('htmlFileInput').click()">
+                        <span>📁</span>
+                        <span style="font-size: var(--font-size-sm);">Or upload an HTML file</span>
+                        <input type="file" id="htmlFileInput" class="file-input" accept=".html,.htm,.txt" onchange="handleHtmlFileSelect(event)">
+                    </div>
+                    <label class="input-label" style="margin-top: var(--spacing-md);">Additional Context (Optional)</label>
+                    <textarea class="feature-input" id="htmlContextInput" style="min-height: 80px; flex: none;"
+                        placeholder="Describe what this HTML component does..."></textarea>
+                </div>
+            </div>
+
+            <!-- Attachment Bar -->
+            <div class="attachment-bar" id="attachmentBar" style="display: none;">
+                <!-- Attachment tags will appear here -->
+            </div>
+
+            <!-- Generate Button Section -->
+            <div class="generate-section">
+                <button class="generate-btn" id="sendBtn" onclick="sendMessage()">
+                    Generate Test Cases
+                </button>
+            </div>
+        </aside>
+
+        <!-- Right Content - Results Section (70%) -->
+        <main class="results-content">
+            <div class="results-header">
+                <span class="results-title">Generated Test Cases</span>
+                <div class="results-actions">
+                    <span class="results-count" id="resultsCount" style="display: none;">0 test cases</span>
+                    <button class="download-btn" id="downloadBtn" onclick="downloadExcel()" style="display: none;">
+                        📥 Download Excel
+                    </button>
+                </div>
+            </div>
+
+            <div id="chat-container">
+                <!-- Welcome Message -->
+                <div class="welcome-message">
+                    <div class="welcome-icon">📝</div>
+                    <h3 class="welcome-title">Ready to Generate Test Cases</h3>
+                    <p class="welcome-text">
+                        Enter a feature description, upload a UI screenshot, or paste HTML code on the left, then click "Generate Test Cases".
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
 
     <script>
-        const chatContainer = document.getElementById('chat-container');
-        const userInput = document.getElementById('userInput');
-        const sendBtn = document.getElementById('sendBtn');
+        // ===== Configuration Management =====
+        const CONFIG_KEY = 'tc_generator_config';
+        
+        let currentConfig = {
+            provider: 'ollama',
+            apiKeys: {
+                openai: '',
+                kimi: '',
+                groq: ''
+            }
+        };
 
-        userInput.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter' && !sendBtn.disabled) sendMessage();
+        // Current attachments
+        let currentAttachments = {
+            image: null,
+            htmlCode: ''
+        };
+
+        // Store current test cases for export
+        let currentTestCases = [];
+        let currentFeatureName = '';
+
+        // Load configuration from localStorage
+        function loadConfig() {
+            const saved = localStorage.getItem(CONFIG_KEY);
+            if (saved) {
+                try {
+                    const parsed = JSON.parse(saved);
+                    currentConfig = { ...currentConfig, ...parsed };
+                } catch (e) {
+                    console.error('Failed to load config:', e);
+                }
+            }
+            applyConfigToUI();
+            updateProviderBadge();
+        }
+
+        function saveConfig() {
+            localStorage.setItem(CONFIG_KEY, JSON.stringify(currentConfig));
+        }
+
+        function applyConfigToUI() {
+            selectProvider(currentConfig.provider, false);
+            document.getElementById('input-openai-key').value = currentConfig.apiKeys.openai || '';
+            document.getElementById('input-kimi-key').value = currentConfig.apiKeys.kimi || '';
+            document.getElementById('input-groq-key').value = currentConfig.apiKeys.groq || '';
+        }
+
+        // ===== Settings Panel Toggle =====
+        function toggleSettings() {
+            const panel = document.getElementById('settingsPanel');
+            panel.classList.toggle('active');
+        }
+
+        // ===== Provider Selection =====
+        function selectProvider(provider, updateConfig = false) {
+            document.querySelectorAll('.provider-option').forEach(el => {
+                el.classList.remove('selected');
+            });
+            document.getElementById(`option-${provider}`).classList.add('selected');
+            
+            document.querySelectorAll('input[name="provider"]').forEach(radio => {
+                radio.checked = (radio.value === provider);
+            });
+            
+            document.querySelectorAll('.api-key-section').forEach(el => {
+                el.classList.remove('visible');
+            });
+            
+            if (provider !== 'ollama') {
+                document.getElementById(`apikey-${provider}`).classList.add('visible');
+            }
+            
+            if (updateConfig) {
+                currentConfig.provider = provider;
+            }
+        }
+
+        function saveSettings() {
+            const selectedRadio = document.querySelector('input[name="provider"]:checked');
+            currentConfig.provider = selectedRadio.value;
+            
+            currentConfig.apiKeys.openai = document.getElementById('input-openai-key').value.trim();
+            currentConfig.apiKeys.kimi = document.getElementById('input-kimi-key').value.trim();
+            currentConfig.apiKeys.groq = document.getElementById('input-groq-key').value.trim();
+            
+            saveConfig();
+            updateProviderBadge();
+            
+            const savedMsg = document.getElementById('settingsSaved');
+            savedMsg.classList.add('show');
+            setTimeout(() => savedMsg.classList.remove('show'), 2000);
+        }
+
+        function updateProviderBadge() {
+            const providerNames = {
+                'ollama': '🖥️ Local LLM (Ollama)',
+                'openai': '🤖 OpenAI',
+                'kimi': '🌙 KIMI (Moonshot AI)',
+                'groq': '⚡ Groq'
+            };
+            document.getElementById('currentProviderText').textContent = 
+                `Using: ${providerNames[currentConfig.provider]}`;
+            
+            // Update image section note based on provider
+            const imageNote = document.getElementById('imageProviderNote');
+            if (imageNote) {
+                // Reset styles
+                imageNote.style.backgroundColor = '';
+                imageNote.style.borderColor = '';
+                
+                if (currentConfig.provider === 'ollama' || currentConfig.provider === 'groq') {
+                    imageNote.style.display = 'block';
+                    imageNote.innerHTML = '<strong>ℹ️ Note:</strong> Local LLM and Groq cannot analyze images directly. Please describe the image in detail below for best results.';
+                } else if (currentConfig.provider === 'openai') {
+                    imageNote.style.display = 'block';
+                    imageNote.innerHTML = '<strong>✓ Good!</strong> OpenAI supports image analysis. The AI will analyze your screenshot. You can still add context below if needed.';
+                    imageNote.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+                    imageNote.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+                } else {
+                    imageNote.style.display = 'block';
+                    imageNote.innerHTML = '<strong>ℹ️ Note:</strong> Please describe the image in detail below for best results.';
+                }
+            }
+        }
+
+        // ===== Tab Switching =====
+        function switchTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.input-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            
+            // Update content sections
+            document.querySelectorAll('.input-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(`section-${tabName}`).classList.add('active');
+        }
+
+        // ===== Image Handling =====
+        function handleImageFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                processImageFile(file);
+            }
+        }
+
+        function processImageFile(file) {
+            if (file.size > 10 * 1024 * 1024) {
+                alert('Image size must be less than 10MB');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentAttachments.image = e.target.result;
+                showImagePreview(e.target.result);
+                updateAttachmentBar();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function showImagePreview(imageData) {
+            const preview = document.getElementById('imagePreview');
+            const container = document.getElementById('imagePreviewContainer');
+            const uploadArea = document.getElementById('imageUploadArea');
+            
+            preview.src = imageData;
+            container.classList.add('visible');
+            uploadArea.classList.add('has-image');
+        }
+
+        function removeImage() {
+            currentAttachments.image = null;
+            document.getElementById('imagePreviewContainer').classList.remove('visible');
+            document.getElementById('imageUploadArea').classList.remove('has-image');
+            document.getElementById('imageFileInput').value = '';
+            updateAttachmentBar();
+        }
+
+        // ===== HTML File Handling =====
+        function handleHtmlFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('htmlCodeInput').value = e.target.result;
+                    currentAttachments.htmlCode = e.target.result;
+                    updateAttachmentBar();
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        // ===== Drag and Drop =====
+        const imageUploadArea = document.getElementById('imageUploadArea');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            imageUploadArea.addEventListener(eventName, preventDefaults, false);
         });
 
-        async function sendMessage() {
-            const text = userInput.value.trim();
-            if (!text) return;
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
 
-            // User Message
-            appendMessage(text, 'user');
-            userInput.value = '';
-            userInput.disabled = true;
+        ['dragenter', 'dragover'].forEach(eventName => {
+            imageUploadArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            imageUploadArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            imageUploadArea.classList.add('drag-over');
+        }
+
+        function unhighlight(e) {
+            imageUploadArea.classList.remove('drag-over');
+        }
+
+        imageUploadArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0 && files[0].type.startsWith('image/')) {
+                processImageFile(files[0]);
+            }
+        }
+
+        // ===== Paste Image Support =====
+        document.addEventListener('paste', function(e) {
+            const activeTab = document.querySelector('.input-tab.active');
+            if (!activeTab || activeTab.id !== 'tab-image') return;
+
+            const items = e.clipboardData.items;
+            for (let i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') !== -1) {
+                    const blob = items[i].getAsFile();
+                    processImageFile(blob);
+                    break;
+                }
+            }
+        });
+
+        // ===== Attachment Bar =====
+        function updateAttachmentBar() {
+            const bar = document.getElementById('attachmentBar');
+            bar.innerHTML = '';
+            
+            let hasAttachments = false;
+            
+            if (currentAttachments.image) {
+                hasAttachments = true;
+                const tag = document.createElement('span');
+                tag.className = 'attachment-tag';
+                tag.innerHTML = `🖼️ Image <span class="remove" onclick="removeImage()">×</span>`;
+                bar.appendChild(tag);
+            }
+            
+            const htmlCode = document.getElementById('htmlCodeInput').value.trim();
+            if (htmlCode) {
+                hasAttachments = true;
+                const tag = document.createElement('span');
+                tag.className = 'attachment-tag';
+                tag.innerHTML = `📄 HTML <span class="remove" onclick="clearHtml()">×</span>`;
+                bar.appendChild(tag);
+            }
+            
+            bar.style.display = hasAttachments ? 'flex' : 'none';
+        }
+
+        function clearHtml() {
+            document.getElementById('htmlCodeInput').value = '';
+            currentAttachments.htmlCode = '';
+            updateAttachmentBar();
+        }
+
+        // Monitor HTML textarea for changes
+        document.getElementById('htmlCodeInput').addEventListener('input', updateAttachmentBar);
+
+        // ===== Chat Functionality =====
+        const chatContainer = document.getElementById('chat-container');
+        const sendBtn = document.getElementById('sendBtn');
+        const resultsCount = document.getElementById('resultsCount');
+        const downloadBtn = document.getElementById('downloadBtn');
+
+        function clearWelcomeMessage() {
+            const welcomeMsg = document.querySelector('.welcome-message');
+            if (welcomeMsg) {
+                welcomeMsg.remove();
+            }
+        }
+
+        function getActiveInput() {
+            const activeTab = document.querySelector('.input-tab.active');
+            const tabName = activeTab.id.replace('tab-', '');
+            
+            switch(tabName) {
+                case 'text':
+                    return {
+                        type: 'text',
+                        content: document.getElementById('textInput').value.trim()
+                    };
+                case 'image':
+                    return {
+                        type: 'image',
+                        content: document.getElementById('imageContextInput').value.trim(),
+                        imageData: currentAttachments.image
+                    };
+                case 'html':
+                    return {
+                        type: 'html',
+                        content: document.getElementById('htmlContextInput').value.trim(),
+                        htmlCode: document.getElementById('htmlCodeInput').value.trim()
+                    };
+                default:
+                    return { type: 'text', content: '' };
+            }
+        }
+
+        async function sendMessage() {
+            const input = getActiveInput();
+            const provider = currentConfig.provider;
+            const apiKey = currentConfig.apiKeys[provider] || '';
+            
+            // Validate input
+            let hasContent = false;
+            let displayText = '';
+            
+            if (input.type === 'text' && input.content) {
+                hasContent = true;
+                displayText = input.content;
+            } else if (input.type === 'image' && (input.content || input.imageData)) {
+                hasContent = true;
+                displayText = input.content || '🖼️ Image uploaded';
+            } else if (input.type === 'html' && (input.content || input.htmlCode)) {
+                hasContent = true;
+                displayText = input.content || '📄 HTML code provided';
+            }
+            
+            if (!hasContent) {
+                alert('Please enter a feature description, upload an image, or provide HTML code.');
+                return;
+            }
+            
+            if (provider !== 'ollama' && !apiKey) {
+                clearWelcomeMessage();
+                const providerNames = {
+                    'openai': 'OpenAI',
+                    'kimi': 'KIMI',
+                    'groq': 'Groq'
+                };
+                appendErrorMessage(`Please configure your ${providerNames[provider] || provider} API key in Settings first.`);
+                return;
+            }
+
+            clearWelcomeMessage();
+            
+            // Show user message
+            appendMessage(displayText.substring(0, 200) + (displayText.length > 200 ? '...' : ''), 'user');
+            
+            // Disable input
             sendBtn.disabled = true;
-            sendBtn.innerHTML = '<div class="loader"></div>';
+            sendBtn.innerHTML = '<div class="loader"></div> Generating...';
 
             try {
-                const response = await fetch('http://localhost:5000/api/generate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user_input: text })
-                });
+                let response;
+                
+                // Prepare request based on input type
+                if (input.type === 'image' && input.imageData) {
+                    // Convert base64 to blob for upload
+                    const formData = new FormData();
+                    
+                    // Combine user context with image note
+                    const userContext = input.content || '';
+                    const fullPrompt = userContext + (userContext ? '\n\n' : '') + 
+                        '[IMPORTANT: Analyze the attached UI screenshot image and generate test cases based on the UI elements visible in the image. Consider all buttons, forms, fields, and interactions shown.]'
+                    formData.append('user_input', fullPrompt);
+                    formData.append('provider', provider);
+                    formData.append('api_key', apiKey);
+                    
+                    // Convert base64 to blob properly
+                    try {
+                        const base64Data = input.imageData.split(',')[1]; // Remove data:image/...;base64, prefix
+                        const byteCharacters = atob(base64Data);
+                        const byteNumbers = new Array(byteCharacters.length);
+                        for (let i = 0; i < byteCharacters.length; i++) {
+                            byteNumbers[i] = byteCharacters.charCodeAt(i);
+                        }
+                        const byteArray = new Uint8Array(byteNumbers);
+                        const blob = new Blob([byteArray], { type: 'image/png' });
+                        formData.append('image', blob, 'screenshot.png');
+                    } catch (e) {
+                        console.error('Image conversion error:', e);
+                        appendErrorMessage('Failed to process image. Please try again.');
+                        sendBtn.disabled = false;
+                        sendBtn.innerHTML = 'Generate Test Cases';
+                        return;
+                    }
+                    
+                    response = await fetch('http://localhost:5000/api/generate', {
+                        method: 'POST',
+                        body: formData
+                    });
+                } else if (input.type === 'html' && input.htmlCode) {
+                    const formData = new FormData();
+                    
+                    // Combine user context with HTML analysis instruction
+                    const userContext = input.content || '';
+                    const fullPrompt = userContext + (userContext ? '\n\n' : '') + 
+                        '[IMPORTANT: Analyze the provided HTML code and generate test cases for ALL UI elements found in the code including forms, buttons, inputs, validations, and interactions. Consider both positive and negative test scenarios.]'
+                    formData.append('user_input', fullPrompt);
+                    formData.append('provider', provider);
+                    formData.append('api_key', apiKey);
+                    formData.append('html_code', input.htmlCode);
+                    
+                    response = await fetch('http://localhost:5000/api/generate', {
+                        method: 'POST',
+                        body: formData
+                    });
+                } else {
+                    // Text only
+                    response = await fetch('http://localhost:5000/api/generate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            user_input: input.content,
+                            provider: provider,
+                            api_key: apiKey
+                        })
+                    });
+                }
 
                 const data = await response.json();
 
                 if (data.error) {
-                    appendMessage(`Error: ${data.error}`, 'bot', true);
+                    appendErrorMessage(data.error);
                 } else if (data.test_cases) {
-                    renderTestCases(data.test_cases);
+                    renderTestCases(data.test_cases, data.provider_used);
                 } else {
                     appendMessage("Received unexpected response format.", 'bot', true);
                 }
 
             } catch (err) {
-                appendMessage(`Connection failed: ${err.message}. Is the backend running on port 5000?`, 'bot', true);
+                appendErrorMessage(`Connection failed: ${err.message}. Is the backend running on port 5000?`);
             } finally {
-                userInput.disabled = false;
                 sendBtn.disabled = false;
-                sendBtn.innerText = 'Generate Test Cases';
-                userInput.focus();
+                sendBtn.innerHTML = 'Generate Test Cases';
             }
         }
 
@@ -502,13 +1673,53 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
-        function renderTestCases(testCases) {
+        function appendErrorMessage(errorText) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message bot';
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.innerHTML = `
+                <div class="error-box">
+                    <div class="error-title">⚠️ Error</div>
+                    <div>${escapeHtml(errorText)}</div>
+                </div>
+            `;
+
+            messageDiv.appendChild(contentDiv);
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function renderTestCases(testCases, providerUsed) {
+            // Store test cases for export
+            currentTestCases = testCases;
+            
             const botDiv = document.createElement('div');
             botDiv.className = 'message bot';
 
             const contentDiv = document.createElement('div');
             contentDiv.className = 'message-content';
 
+            // Provider info badge
+            const providerNames = {
+                'ollama': 'Local LLM (Ollama)',
+                'openai': 'OpenAI',
+                'kimi': 'KIMI (Moonshot AI)'
+            };
+            
+            const providerInfo = document.createElement('div');
+            providerInfo.className = 'provider-info-badge';
+            providerInfo.innerHTML = `✓ Generated ${testCases.length} test cases using <strong>${providerNames[providerUsed] || providerUsed}</strong>`;
+            contentDiv.appendChild(providerInfo);
+
+            // Update results count and show download button
+            resultsCount.textContent = `${testCases.length} test case${testCases.length !== 1 ? 's' : ''}`;
+            resultsCount.style.display = 'inline-block';
+            downloadBtn.style.display = 'inline-flex';
+            resultsCount.style.display = 'inline-block';
+
+            // Render test case cards
             testCases.forEach(tc => {
                 const card = document.createElement('div');
                 card.className = 'tc-card';
@@ -550,13 +1761,77 @@
             chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
+        // ===== Excel Download Function =====
+        async function downloadExcel() {
+            if (!currentTestCases || currentTestCases.length === 0) {
+                alert('No test cases to download. Generate test cases first.');
+                return;
+            }
+            
+            // Get feature name from input
+            const input = getActiveInput();
+            let featureName = 'Test_Cases';
+            if (input.content) {
+                // Extract first few words for filename
+                featureName = input.content.split(' ').slice(0, 5).join('_').replace(/[^a-zA-Z0-9_]/g, '');
+            }
+            
+            downloadBtn.disabled = true;
+            downloadBtn.innerHTML = '⏳ Preparing...';
+            
+            try {
+                const response = await fetch('http://localhost:5000/api/export/excel', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        test_cases: currentTestCases,
+                        feature_name: featureName
+                    })
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to generate Excel');
+                }
+                
+                // Get filename from Content-Disposition header or use default
+                const disposition = response.headers.get('Content-Disposition');
+                let filename = 'test_cases.xlsx';
+                if (disposition && disposition.indexOf('filename=') !== -1) {
+                    const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+                    const matches = filenameRegex.exec(disposition);
+                    if (matches && matches[1]) {
+                        filename = matches[1].replace(/['"]/g, '');
+                    }
+                }
+                
+                // Download file
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+            } catch (err) {
+                alert('Error downloading Excel: ' + err.message);
+            } finally {
+                downloadBtn.disabled = false;
+                downloadBtn.innerHTML = '📥 Download Excel';
+            }
+        }
+
         function escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', loadConfig);
     </script>
-
 </body>
-
 </html>

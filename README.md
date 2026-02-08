@@ -2,11 +2,12 @@
 
 ## 📖 What Is This Project?
 
-This is a **Test Case Generator** that uses **Artificial Intelligence** to automatically create test cases for software testing. Instead of writing test cases manually (which takes a lot of time), you simply describe what feature you want to test, and the AI writes the test cases for you.
+This is a **Test Case Generator** that uses **Artificial Intelligence** to automatically create comprehensive test cases for software testing. Instead of writing test cases manually (which takes a lot of time), you simply describe what feature you want to test, upload a screenshot, or paste HTML code, and the AI writes detailed test cases for you.
 
-**Example:**
-- You type: "User Login with Password"
-- AI generates: 5-10 detailed test cases covering different scenarios (valid login, wrong password, empty fields, etc.)
+**Examples:**
+- **Text:** Type "User Login with Password" → AI generates 15-20 detailed test cases
+- **Image:** Upload a UI screenshot → AI analyzes the interface and creates test cases
+- **HTML:** Paste HTML code → AI tests all elements in the code
 
 ---
 
@@ -14,20 +15,26 @@ This is a **Test Case Generator** that uses **Artificial Intelligence** to autom
 
 - **QA Engineers** who want to save time writing test cases
 - **Software Testers** who need comprehensive test coverage quickly
+- **Developers** who want to ensure their features are well-tested
 - **Teams** who want consistent, well-structured test documentation
 
 ---
 
 ## 🏗️ How Does It Work? (Simple Explanation)
 
-Think of this project like a **restaurant**:
+Think of this project like a **modern restaurant with multiple chefs**:
 
-1. **You (Customer)** → Tell the waiter what you want
-2. **Frontend (Waiter)** → Takes your order and sends it to the kitchen
-3. **Backend (Kitchen Manager)** → Receives the order and asks the chef to cook
-4. **Ollama + Llama 3.2 (Chef)** → Prepares the food (generates test cases)
-5. **Backend (Kitchen Manager)** → Checks the food quality and sends it back
-6. **Frontend (Waiter)** → Delivers the finished dish to you
+1. **You (Customer)** → Tell the waiter what you want (text, image, or HTML)
+2. **Frontend (Waiter)** → Takes your order and shows it on a split-screen display
+3. **Backend (Kitchen Manager)** → Receives the order and picks the right chef
+4. **Choose Your Chef (AI Provider)**:
+   - 👨‍🍳 **Local Chef (Ollama)** - Works in the back kitchen, no delivery fee
+   - 👨‍🍳 **Gourmet Chef (OpenAI)** - World-famous, can look at your photos
+   - 👨‍🍳 **Asian Chef (KIMI)** - Specializes in complex recipes
+   - 👨‍🍳 **Speed Chef (Groq)** - Super fast, gets food ready in seconds
+5. **Chef Cooks** → Prepares 15-20 dishes (test cases) based on your order
+6. **Kitchen Manager** → Checks quality, packages for takeaway (Excel file)
+7. **Waiter Serves** → Delivers the feast on a beautiful split-screen platter
 
 ---
 
@@ -37,90 +44,89 @@ Think of this project like a **restaurant**:
 ┌─────────────────────────────────────────────────────────────────┐
 │                         USER (You)                              │
 │                                                                 │
-│  "I want test cases for User Login with 2FA"                   │
+│  Input Options:                                                │
+│  📝 "Login with 2FA" | 🖼️ Screenshot | 📄 HTML Code           │
 └────────────────────────────┬────────────────────────────────────┘
                              │
-                             │ (1) User types feature description
+                             │ (1) Choose input type (Text/Image/HTML)
+                             │     Pick your chef (Ollama/OpenAI/KIMI/Groq)
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    FRONTEND (Web Browser)                       │
-│                     index.html + JavaScript                     │
+│                     Split-Screen Interface                      │
 │                                                                 │
-│  • Beautiful Leoforce-branded interface                        │
-│  • Input box for feature description                           │
-│  • Display area for test cases                                 │
+│  ┌─────────────────┐  ┌──────────────────────────────────────┐ │
+│  │  INPUT (30%)    │  │  RESULTS (70%)                       │ │
+│  │  • Text area    │  │  • Test Case Cards                   │ │
+│  │  • Image upload │  │  • Download Excel button             │ │
+│  │  • HTML editor  │  │                                      │ │
+│  │  • Generate btn │  │                                      │ │
+│  └─────────────────┘  └──────────────────────────────────────┘ │
 └────────────────────────────┬────────────────────────────────────┘
                              │
                              │ (2) Sends HTTP request to backend
                              │     POST /api/generate
-                             │     { "user_input": "User Login..." }
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    BACKEND (Python Flask)                       │
 │                         app.py                                  │
 │                                                                 │
-│  • Receives user request                                       │
+│  • Receives user request (text/image/html)                     │
 │  • Validates input                                             │
-│  • Calls Ollama Adapter                                        │
+│  • Routes to selected AI Adapter                               │
+│  • Handles Excel export requests                               │
 └────────────────────────────┬────────────────────────────────────┘
                              │
-                             │ (3) Calls Ollama Adapter
-                             │     generate_test_cases("User Login...")
+                             │ (3) Calls selected AI Adapter
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                   OLLAMA ADAPTER (Python)                       │
-│                    ollama_adapter.py                            │
+│              AI ADAPTER (Python) - Pick Your Chef!              │
+│                   llm_adapter.py                                │
 │                                                                 │
-│  • Creates a smart prompt for the AI                           │
-│  • Sends request to Ollama API                                 │
+│  👨‍🍳 OllamaAdapter    - Local Llama 3.2 (Free, Private)         │
+│  👨‍🍳 OpenAIAdapter    - GPT-3.5/4 (Vision, Powerful)            │
+│  👨‍🍳 KimiAdapter      - Moonshot AI (Chinese-optimized)         │
+│  👨‍🍳 GroqAdapter      - Llama 3.1 Instant (Ultra-fast)          │
+│                                                                 │
+│  • Creates smart prompt with image/HTML context                │
+│  • Sends request to AI service                                 │
 │  • Cleans up AI response (removes markdown, fixes JSON)        │
 └────────────────────────────┬────────────────────────────────────┘
                              │
-                             │ (4) Sends prompt to Ollama
-                             │     "You are a QA Engineer. Generate
-                             │      test cases for: User Login..."
+                             │ (4) AI generates 15-25 test cases
+                             │     Covers: happy path, errors, security,
+                             │     UI/UX, boundary cases, integrations
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    OLLAMA (Local AI Server)                     │
-│                    Running on port 11434                        │
+│                    AI SERVICE (Cloud or Local)                  │
 │                                                                 │
-│  • Runs Llama 3.2 AI model locally on your computer           │
-│  • Generates intelligent test cases                            │
-│  • Returns JSON response                                       │
+│  • Analyzes your input (text/image/HTML)                       │
+│  • Generates comprehensive test scenarios                      │
+│  • Returns structured JSON response                            │
 └────────────────────────────┬────────────────────────────────────┘
                              │
-                             │ (5) Returns generated test cases
+                             │ (5) Returns to Backend
                              │     { "test_cases": [...] }
-                             ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                   OLLAMA ADAPTER (Python)                       │
-│                                                                 │
-│  • Validates JSON format                                       │
-│  • Fixes any formatting issues                                 │
-│  • Returns clean data                                          │
-└────────────────────────────┬────────────────────────────────────┘
-                             │
-                             │ (6) Returns to Backend
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    BACKEND (Python Flask)                       │
 │                                                                 │
 │  • Receives test cases from Adapter                            │
+│  • Can export to Excel format                                  │
 │  • Sends HTTP response to Frontend                             │
 └────────────────────────────┬────────────────────────────────────┘
                              │
-                             │ (7) Sends response back
-                             │     { "test_cases": [...] }
+                             │ (6) Sends response back
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                    FRONTEND (Web Browser)                       │
 │                                                                 │
-│  • Receives test cases                                         │
-│  • Displays them in beautiful cards                            │
-│  • Shows: ID, Title, Steps, Expected Result                    │
+│  • Displays test cases in beautiful cards                      │
+│  • Shows: ID, Title, Description, Preconditions, Steps         │
+│  • Offers 📥 Download Excel button                             │
 └─────────────────────────────────────────────────────────────────┘
                              │
-                             │ (8) User sees the results!
+                             │ (7) User sees the results!
                              ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                         USER (You)                              │
@@ -128,78 +134,106 @@ Think of this project like a **restaurant**:
 │  ✅ TC_001: Verify Login with Valid Credentials                │
 │  ✅ TC_002: Verify Login with Invalid Password                 │
 │  ✅ TC_003: Verify Login with Empty Fields                     │
+│  ✅ ... (15-25 comprehensive test cases!)                      │
+│                                                                 │
+│  📥 Download as Excel file                                     │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
+## 🌟 Key Features
+
+### **1. 📝 Multiple Input Types**
+- **Text:** Describe your feature in plain English
+- **Image:** Upload a UI screenshot (drag-drop, paste, or file picker)
+- **HTML:** Paste code directly or upload HTML files
+
+### **2. 🤖 Multiple AI Providers**
+Choose the "chef" that fits your needs:
+
+| Provider | Type | Best For | Image Support |
+|----------|------|----------|---------------|
+| **Ollama** | Local (Free) | Privacy, no internet needed | ❌ Text description only |
+| **OpenAI** | Cloud | Best quality, vision capabilities | ✅ Yes (GPT-4 Vision) |
+| **KIMI** | Cloud | Chinese language, fast responses | ❌ Text description only |
+| **Groq** | Cloud | Ultra-fast inference | ❌ Text description only |
+
+### **3. 🎨 Modern Split-Screen UI**
+- **Left Side (30%):** Clean input area with tabs for Text/Image/HTML
+- **Right Side (70%):** Spacious results area showing generated test cases
+- **Responsive:** Works on desktop and mobile
+
+### **4. 📊 Comprehensive Test Coverage**
+Each generation produces **15-25 test cases** covering:
+- ✅ Happy path (everything works correctly)
+- ❌ Error cases (invalid inputs, failures)
+- 🔒 Security tests (authentication, injection attacks)
+- 🎨 UI/UX tests (responsiveness, accessibility)
+- 📏 Boundary value tests (min/max values)
+- 🔗 Integration scenarios
+
+### **5. 📥 Excel Export**
+Download your test cases as a professionally formatted Excel file with:
+- Sheet 1: All test cases with proper formatting
+- Sheet 2: Summary with metadata
+- Leoforce branding and colors
+
+---
+
 ## 🔧 Step-by-Step: What Happens When You Click "Generate"
 
-### **Step 1: You Type Your Request**
-- You open the web page at `http://localhost:5000`
-- You type something like: **"User Login with Email and Password"**
-- You click the **"Generate Test Cases"** button
+### **Step 1: You Choose Your Input**
+- Open the web page at `http://localhost:5000`
+- Select a tab: **📝 Text**, **🖼️ Image**, or **📄 HTML**
+- Provide your input (type description, upload image, or paste code)
+- Click the **"Generate Test Cases"** button
 
 ### **Step 2: Frontend Sends Request**
-- The JavaScript code in `index.html` takes your text
-- It creates a package (JSON) that looks like this:
-  ```json
-  {
-    "user_input": "User Login with Email and Password"
-  }
-  ```
-- It sends this package to the Backend using HTTP POST
+- JavaScript collects your input
+- For images: Converts to the right format for upload
+- For HTML: Packages the code with any context
+- Sends to the Backend via HTTP POST
 
 ### **Step 3: Backend Receives Request**
-- The Flask server (`app.py`) is listening on port 5000
-- It receives your request at the `/api/generate` endpoint
-- It checks: "Did the user actually type something?" (validation)
-- If yes, it calls the Ollama Adapter
+- Flask server (`app.py`) receives the request
+- Checks which AI provider you selected
+- Validates that API keys are provided if needed
+- Calls the appropriate AI Adapter
 
-### **Step 4: Ollama Adapter Creates Smart Prompt**
-- The `ollama_adapter.py` file creates a special instruction for the AI
-- It tells the AI: "You are a Senior QA Engineer. Generate test cases for this feature..."
-- It also tells the AI: "Return your answer in JSON format only, no extra text"
+### **Step 4: AI Adapter Creates Smart Prompt**
+- The `llm_adapter.py` creates a detailed instruction for the AI
+- Includes your input + context about images/HTML
+- Explicitly tells the AI: "Generate 15-25 test cases minimum"
+- Specifies coverage requirements (happy path, errors, security, etc.)
 
-### **Step 5: Request Goes to Ollama**
-- Ollama is a program running on your computer (port 11434)
-- It's like having ChatGPT, but running locally
-- Ollama loads the **Llama 3.2** AI model (2GB file)
-- The AI "thinks" about your request and generates test cases
+### **Step 5: AI Analyzes and Generates**
+- **OpenAI with images:** Actually "sees" your screenshot and analyzes UI elements
+- **Other providers:** Analyzes your text description + any HTML code
+- Creates comprehensive test scenarios
+- Formats output as structured JSON
 
-### **Step 6: AI Generates Test Cases**
-- Llama 3.2 analyzes your feature description
-- It creates multiple test cases covering:
-  - ✅ Happy path (everything works)
-  - ❌ Error cases (wrong password, empty fields)
-  - 🔒 Security cases (SQL injection, etc.)
-- It formats everything as JSON
+### **Step 6: Adapter Cleans Response**
+- Removes extra text like "Here are the test cases:"
+- Uses regex to extract valid JSON
+- Validates the structure
 
-### **Step 7: Ollama Adapter Cleans Response**
-- Sometimes the AI adds extra text like "Here are the test cases:"
-- The Adapter removes this extra text
-- It uses **regex** (pattern matching) to extract only the JSON part
-- It validates: "Is this valid JSON? Can we use it?"
+### **Step 7: Backend Sends Response**
+- Receives clean test case data
+- Adds metadata (provider used, has image, has HTML)
+- Sends back to Frontend
 
-### **Step 8: Backend Sends Response**
-- The Backend receives the clean JSON from the Adapter
-- It sends it back to the Frontend as an HTTP response
-
-### **Step 9: Frontend Displays Results**
+### **Step 8: Frontend Displays Results**
 - JavaScript receives the JSON data
-- It creates beautiful **Test Case Cards** for each test case
-- Each card shows:
-  - **ID**: TC_001, TC_002, etc.
-  - **Title**: "Verify Login with Valid Credentials"
-  - **Description**: What is being tested
-  - **Preconditions**: Setup needed
-  - **Steps**: 1, 2, 3... (ordered list)
-  - **Expected Result**: What should happen
+- Creates beautiful **Test Case Cards** for each test case
+- Shows provider badge and test case count
+- Enables the **📥 Download Excel** button
 
-### **Step 10: You See the Results!**
-- The test cases appear on your screen
-- You can read them, copy them, or use them in your testing
-- Total time: **5-15 seconds** (depending on your computer)
+### **Step 9: You See the Results!**
+- Browse through 15-25 detailed test cases
+- Each card shows: ID, Title, Description, Preconditions, Steps, Expected Result
+- Click **Download Excel** to save as a file
+- Total time: **5-30 seconds** (depending on provider)
 
 ---
 
@@ -209,14 +243,15 @@ Think of this project like a **restaurant**:
 Agent_TC_Generator_using_Local_LLM/
 │
 ├── frontend/                    # What the user sees
-│   ├── index.html              # The web page (UI)
+│   ├── index.html              # The web page with split-screen UI
 │   └── leoforce_logo.png       # Company logo
 │
 ├── backend/                     # The server (brain)
-│   └── app.py                  # Flask server - handles requests
+│   └── app.py                  # Flask server - handles requests & Excel export
 │
 ├── tools/                       # Helper scripts
-│   ├── ollama_adapter.py       # Talks to Ollama AI
+│   ├── llm_adapter.py          # Multi-provider AI adapter (Ollama/OpenAI/KIMI/Groq)
+│   ├── excel_export.py         # Excel file generation
 │   └── test_ollama.py          # Tests if Ollama is working
 │
 ├── architecture/                # Documentation
@@ -237,12 +272,13 @@ Agent_TC_Generator_using_Local_LLM/
 
 | File | What It Does |
 |------|--------------|
-| **`frontend/index.html`** | The web page you see in your browser. Has input box, buttons, and displays test cases. |
-| **`backend/app.py`** | The Python server. Receives requests from the web page and sends them to Ollama. |
-| **`tools/ollama_adapter.py`** | The "translator" between our app and the AI. Creates smart prompts and cleans responses. |
+| **`frontend/index.html`** | The web page with modern split-screen design. Has tabs for Text/Image/HTML input, displays test cases in cards. |
+| **`backend/app.py`** | The Python server. Receives requests, routes to AI providers, handles Excel export. |
+| **`tools/llm_adapter.py`** | The "chef selector" - supports 4 different AI providers with unified interface. |
+| **`tools/excel_export.py`** | Creates professionally formatted Excel files from test cases. |
 | **`tools/test_ollama.py`** | A simple script to check if Ollama is running correctly. |
-| **`gemini.md`** | The "rulebook" - defines what format test cases should have. |
-| **`requirements.txt`** | List of Python libraries needed (Flask, requests, etc.). |
+| **`gemini.md`** | The "rulebook" - defines data formats and behavioral rules. |
+| **`requirements.txt`** | List of Python libraries needed (Flask, requests, openpyxl, etc.). |
 
 ---
 
@@ -251,11 +287,15 @@ Agent_TC_Generator_using_Local_LLM/
 ### **Prerequisites (What You Need)**
 
 1. **Python 3.8 or higher** installed on your computer
-2. **Ollama** installed and running
-3. **Llama 3.2 model** downloaded in Ollama
+2. **At least one AI provider** configured:
+   - **Ollama** (free, runs locally) - OR -
+   - **OpenAI API key** (cloud) - OR -
+   - **KIMI API key** (cloud) - OR -
+   - **Groq API key** (cloud)
 
-### **Step 1: Install Ollama**
+### **Option 1: Using Ollama (Free, Local)**
 
+**Step 1: Install Ollama**
 1. Download Ollama from: https://ollama.ai
 2. Install it on your computer
 3. Open a terminal and run:
@@ -264,43 +304,55 @@ Agent_TC_Generator_using_Local_LLM/
    ```
    (This downloads the AI model - about 2GB)
 
-### **Step 2: Install Python Dependencies**
-
-Open a terminal in the project folder and run:
+**Step 2: Install Python Dependencies**
 ```bash
 pip install -r requirements.txt
 ```
 
-This installs:
-- **Flask** (web server)
-- **Flask-CORS** (allows frontend to talk to backend)
-- **requests** (makes HTTP calls to Ollama)
-
-### **Step 3: Start the Server**
-
-Run this command:
+**Step 3: Start the Server**
 ```bash
 python backend/app.py
 ```
 
-You should see:
+**Step 4: Open the Web Page**
+Go to: `http://localhost:5000`
+
+---
+
+### **Option 2: Using OpenAI (Cloud)**
+
+**Step 1: Get API Key**
+1. Go to https://platform.openai.com
+2. Sign up and create an API key
+3. Copy the key (starts with `sk-`)
+
+**Step 2: Install Python Dependencies**
+```bash
+pip install -r requirements.txt
 ```
-Starting Flask Server on port 5000...
-* Running on http://127.0.0.1:5000
+
+**Step 3: Start the Server**
+```bash
+python backend/app.py
 ```
 
-### **Step 4: Open the Web Page**
+**Step 4: Configure in UI**
+1. Open `http://localhost:5000`
+2. Click **⚙️ Settings**
+3. Select **🤖 OpenAI**
+4. Paste your API key
+5. Click **Save Settings**
 
-1. Open your web browser
-2. Go to: `http://localhost:5000`
-3. You should see the Leoforce-branded interface
+---
 
-### **Step 5: Generate Test Cases!**
+### **Option 3: Using Groq (Fast Cloud)**
 
-1. Type a feature description (e.g., "Shopping Cart Checkout")
-2. Click "Generate Test Cases"
-3. Wait 5-15 seconds
-4. See your test cases appear!
+**Step 1: Get API Key**
+1. Go to https://console.groq.com
+2. Sign up and create an API key
+3. Copy the key (starts with `gsk_`)
+
+**Step 2-4:** Same as OpenAI above, but select **⚡ Groq** in settings.
 
 ---
 
@@ -308,7 +360,7 @@ Starting Flask Server on port 5000...
 
 **Input:** "User Login with Email and Password"
 
-**Output:**
+**Output:** 15-20 test cases including:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -343,6 +395,9 @@ Starting Flask Server on port 5000...
 │                                                         │
 │ Expected Result: Error message "Invalid credentials"   │
 └─────────────────────────────────────────────────────────┘
+
+[... 13-18 more test cases covering security, UI/UX, 
+     boundary cases, and integration scenarios ...]
 ```
 
 ---
@@ -358,17 +413,24 @@ Starting Flask Server on port 5000...
 python backend/app.py
 ```
 
+---
+
 ### **Problem 2: "Ollama API Error"**
 
 **Cause:** Ollama is not running
 
 **Solution:**
-1. Open a new terminal
-2. Check if Ollama is running:
+1. Check if Ollama is running:
    ```bash
    ollama list
    ```
-3. If not, start Ollama (it usually runs automatically)
+2. If not, start Ollama (it usually runs automatically)
+3. Make sure you pulled the model:
+   ```bash
+   ollama pull llama3.2
+   ```
+
+---
 
 ### **Problem 3: "Model 'llama3.2' not found"**
 
@@ -379,14 +441,41 @@ python backend/app.py
 ollama pull llama3.2
 ```
 
-### **Problem 4: Slow response (takes 30+ seconds)**
+---
 
-**Cause:** Your computer is processing the AI model
+### **Problem 4: Invalid API Key error (OpenAI/KIMI/Groq)**
+
+**Cause:** API key is missing or incorrect
 
 **Solution:**
-- This is normal for the first request
+1. Open the web app
+2. Click **⚙️ Settings**
+3. Select your provider
+4. Enter a valid API key
+5. Click **Save Settings**
+
+---
+
+### **Problem 5: Slow response (takes 30+ seconds)**
+
+**Cause:** 
+- Local LLM (Ollama) is processing on your computer
+- Or using a slower cloud provider
+
+**Solution:**
+- This is normal for the first request with Ollama
+- Switch to **Groq** in Settings for ultra-fast responses
 - Subsequent requests will be faster
-- Consider using a smaller model if your computer is slow
+
+---
+
+### **Problem 6: Images not being analyzed**
+
+**Cause:** Most providers (Ollama, Groq, KIMI) cannot "see" images
+
+**Solution:**
+- **For OpenAI:** Make sure you're using GPT-4 Vision model
+- **For other providers:** Describe the image in the text box below the upload area
 
 ---
 
@@ -396,47 +485,39 @@ ollama pull llama3.2
 
 - **Frontend:** HTML5, Vanilla JavaScript, CSS3
 - **Backend:** Python 3.x, Flask
-- **AI:** Ollama (Llama 3.2 model)
+- **AI Providers:** 
+  - Ollama (Local Llama 3.2)
+  - OpenAI (GPT-3.5/4)
+  - KIMI (Moonshot AI)
+  - Groq (Llama 3.1 Instant)
+- **Excel Export:** openpyxl
 - **Design:** Leoforce Design Language 2.0
 
-### **API Endpoint**
+### **API Endpoints**
 
 ```
-POST http://localhost:5000/api/generate
-Content-Type: application/json
-
-Request Body:
-{
-  "user_input": "Feature description here"
-}
-
-Response:
-{
-  "test_cases": [
-    {
-      "id": "TC_001",
-      "title": "Test title",
-      "description": "What is tested",
-      "preconditions": "Setup needed",
-      "steps": ["Step 1", "Step 2"],
-      "expected_result": "Expected outcome"
-    }
-  ]
-}
+GET  /api/providers           → List available AI providers
+POST /api/generate            → Generate test cases
+     Request: { user_input, provider, api_key, html_code }
+     or multipart/form-data with image
+     
+POST /api/export/excel        → Export to Excel
+     Request: { test_cases, feature_name }
+     Response: .xlsx file download
 ```
 
 ### **Data Flow**
 
 1. User Input → Frontend (JavaScript)
-2. Frontend → Backend (HTTP POST)
-3. Backend → Ollama Adapter (Python function call)
-4. Ollama Adapter → Ollama API (HTTP POST to port 11434)
-5. Ollama API → Llama 3.2 Model (AI inference)
-6. Llama 3.2 → Ollama API (JSON response)
-7. Ollama API → Ollama Adapter (HTTP response)
-8. Ollama Adapter → Backend (Python return)
+2. Frontend → Backend (HTTP POST /api/generate)
+3. Backend → AI Adapter (Python function call)
+4. AI Adapter → AI Service (HTTP POST)
+5. AI Service → AI Model (Inference)
+6. AI Model → AI Service (JSON response)
+7. AI Service → AI Adapter (HTTP response)
+8. AI Adapter → Backend (Python return)
 9. Backend → Frontend (HTTP response)
-10. Frontend → User (Display test cases)
+10. Frontend → User (Display + Excel export option)
 
 ---
 
@@ -449,10 +530,10 @@ This project was built following the **B.L.A.S.T. protocol** (Blueprint, Link, A
 ## 🤝 Contributing
 
 This is a learning project. Feel free to:
-- Add new features
+- Add new AI providers
 - Improve the AI prompts
 - Enhance the UI design
-- Add export functionality (CSV, Excel, etc.)
+- Add more export formats (PDF, CSV, etc.)
 
 ---
 
@@ -465,4 +546,4 @@ If you have questions or issues:
 
 ---
 
-**Built with ❤️ using Local AI (No internet required!)**
+**Built with ❤️ using AI - Multiple providers, Maximum flexibility!**
