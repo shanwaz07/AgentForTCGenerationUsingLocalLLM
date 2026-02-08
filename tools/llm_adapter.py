@@ -215,7 +215,7 @@ class OpenAIAdapter(BaseLLMAdapter):
         payload = {
             "model": self.model,
             "messages": messages,
-            "temperature": 0.7,
+            "temperature": 0.1,
             "max_tokens": 4000
         }
         
@@ -279,7 +279,7 @@ class KimiAdapter(BaseLLMAdapter):
         payload = {
             "model": self.model,
             "messages": messages,
-            "temperature": 0.7,
+            "temperature": 0.1,
             "max_tokens": 4000
         }
         
@@ -343,7 +343,7 @@ class GroqAdapter(BaseLLMAdapter):
         payload = {
             "model": self.model,
             "messages": messages,
-            "temperature": 0.7,
+            "temperature": 0.1,
             "max_tokens": 4000
         }
         
